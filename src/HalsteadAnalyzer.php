@@ -149,7 +149,16 @@ final class HalsteadAnalyzer
     ];
 
     /** @var array<int, true> */
-    private const FUNCTION_LIKE_KEYWORDS = [
+    private const PARENTHESIZED_KEYWORDS = [
+        T_IF => true,
+        T_ELSEIF => true,
+        T_SWITCH => true,
+        T_MATCH => true,
+        T_FOR => true,
+        T_FOREACH => true,
+        T_WHILE => true,
+        T_CATCH => true,
+        T_DECLARE => true,
         T_ISSET => true,
         T_EMPTY => true,
         T_UNSET => true,
@@ -364,7 +373,7 @@ final class HalsteadAnalyzer
             $id = $previous[0];
 
             return $this->isIdentifierToken($id)
-                || isset(self::FUNCTION_LIKE_KEYWORDS[$id]);
+                || isset(self::PARENTHESIZED_KEYWORDS[$id]);
         }
 
         return false;

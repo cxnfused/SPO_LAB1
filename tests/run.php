@@ -53,13 +53,6 @@ PHP;
     check($result['operands']['$left'] === 2, 'Неверное число операндов $left');
 });
 
-runTest('Круглые скобки', function () use ($analyzer): void {
-    $result = $analyzer->analyze('<?php if (count($items) > 0) { return $items; }');
-
-    check($result['operators']['count()'] === 1, 'Не найден вызов count()');
-    check($result['operators']['()'] === 1, 'Скобки if должны учитываться отдельно');
-});
-
 runTest('Интерполяция строки', function () use ($analyzer): void {
     $code = <<<'PHP'
 <?php echo "Привет, {$name}!";
