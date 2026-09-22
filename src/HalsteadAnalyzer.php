@@ -210,6 +210,16 @@ final class HalsteadAnalyzer
                     continue;
                 }
 
+                if ($id === T_CURLY_OPEN || $id === T_DOLLAR_OPEN_CURLY_BRACES) {
+                    $delimiterStack[] = [
+                        'symbol' => '{',
+                        'attached' => false,
+                        'interpolation' => true,
+                    ];
+                    $significant[] = $token;
+                    continue;
+                }
+
                 if (isset(self::KEYWORD_OPERATORS[$id])) {
                     $this->increment($operators, self::KEYWORD_OPERATORS[$id]);
                 } elseif (isset(self::TOKEN_OPERATORS[$id])) {
@@ -228,6 +238,7 @@ final class HalsteadAnalyzer
                 $delimiterStack[] = [
                     'symbol' => $token,
                     'attached' => $token === '(' && $this->isAttachedParenthesis($significant),
+                    'interpolation' => false,
                 ];
                 $significant[] = $token;
                 continue;
@@ -369,7 +380,7 @@ final class HalsteadAnalyzer
     }
 
     /**
-     * @param list<array{symbol: string, attached: bool}> $stack
+     * @param list<array{symbol: string, attached: bool, interpolation: bool}> $stack
      * @param array<string, int> $operators
      */
     private function closeDelimiter(string $closing, array &$stack, array &$operators): void
@@ -379,6 +390,10 @@ final class HalsteadAnalyzer
 
         if ($entry === null || $entry['symbol'] !== $expectedOpening) {
             throw new InvalidArgumentException('Нарушен порядок парных разделителей PHP-кода.');
+        }
+
+        if ($entry['interpolation']) {
+            return;
         }
 
         if ($closing === ')' && $entry['attached']) {
